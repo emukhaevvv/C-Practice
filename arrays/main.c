@@ -31,21 +31,41 @@ void jugged_update(JAarray* jAarray) {
   jAarray->array = updatedArray;
 }
 
-void jugged_push(JAarray* jAarray, int value) {
+void check_jugged_full(JAarray* jAarray) {
   if (jAarray->len == jAarray->cap) {
     jugged_update(jAarray);
   }
+} 
+
+void jugged_push(JAarray* jAarray, int value) {
+  check_jugged_full(jAarray);
 
   jAarray->array[jAarray->len] = value;
+  jAarray->len += 1;
+}
+
+void jugged_unshift(JAarray* jAarray, int value) {
+  check_jugged_full(jAarray);
+
+  for (int i = jAarray->len; i >= 0; i--) {
+    jAarray->array[i + 1] = jAarray->array[i];
+  }
+
+  jAarray->array[0] = value;
   jAarray->len += 1;
 }
 
 int main() {
   JAarray* array = jugged_array(4);
 
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 4; i++) {
     jugged_push(array, i);
   }
+
+  jugged_unshift(array, 12);
+  jugged_unshift(array, 23);
+  jugged_unshift(array, 65);
+  jugged_unshift(array, 22);
 
   for (int i = 0; i < 10; i++) {
     printf("%d\n", array->array[i]);
