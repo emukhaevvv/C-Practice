@@ -1,5 +1,6 @@
 #include "stdio.h"
 #include "stdlib.h"
+#include <stdbool.h>
 
 typedef struct {
   int len;
@@ -78,29 +79,33 @@ void jugged_concat(JAarray* jAarrayX, JAarray* jAarrayY) {
   }
 }
 
-int main() {
-  JAarray* array = jugged_array(4);
-  JAarray* arrayX = jugged_array(2);
+bool jugged_every(JAarray* jAarray, bool func(int item, int index, JAarray* jAarray)) {
+  if (jAarray->len == 0) return true;
 
-  jugged_push(arrayX, 322);
-  jugged_push(arrayX, 1337);
-
-  for (int i = 0; i < 4; i++) {
-    jugged_push(array, i);
+  for (int i = 0; i < jAarray->len; i++) {
+    int value = jAarray->array[i];
+    if (!func(value, i, jAarray)) return false;
   }
 
-  jugged_unshift(array, 12);
-  jugged_unshift(array, 23);
-  jugged_unshift(array, 65);
-  jugged_unshift(array, 22);
-  jugged_pop(array);
-  jugged_shift(array);
-  
-  jugged_concat(array, arrayX);
+  return true;
+}
+
+bool everyWithoutZero(int item, int index, JAarray* jAarray) {
+  if (jAarray->array[0] == 0 || index > 15) return false;
+}
+
+int main() {
+  JAarray* array = jugged_array(4);
+
+  for (int i = 1; i < 15; i++) {
+    jugged_push(array, i);
+  }
 
   for (int i = 0; i < array->len; i++) {
     printf("%d\n", array->array[i]);
   }
- 
+
+  printf("%d", jugged_every(array, everyWithoutZero));
+
   return 0;
 }
