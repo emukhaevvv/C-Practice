@@ -21,7 +21,7 @@ JAarray* jugged_array(int capacity) {
 void jugged_update(JAarray* jAarray) {
   jAarray->cap = jAarray->cap * 2;
 
-  int* updatedArray = (int*)malloc(jAarray->cap * sizeof(int*));
+  int* updatedArray = (int*)malloc(jAarray->cap * sizeof(int));
 
   for (int i = 0; i < jAarray->len; i++) {
     updatedArray[i] = jAarray->array[i];
@@ -90,22 +90,47 @@ bool jugged_every(JAarray* jAarray, bool func(int item, int index, JAarray* jAar
   return true;
 }
 
+JAarray* jugged_filter(JAarray* jAarray, bool func(int item, int index, JAarray* jAarray)) {
+  JAarray* filteredArray = jugged_array(4);
+
+  for (int i = 0; i < jAarray->len; i++) {
+    int value = jAarray->array[i];
+
+    if (func(value, i, jAarray)) {
+      jugged_push(filteredArray, value);
+    }
+  }
+
+  return filteredArray;
+}
+
+// Helpers
 bool everyWithoutZero(int item, int index, JAarray* jAarray) {
   if (jAarray->array[0] == 0 || index > 15) return false;
 }
 
-int main() {
+bool isPrime(int item, int index, JAarray* jAarray) {
+  for (int i = 2; item > i; i++) {
+    if (item % i == 0) {
+      return false;
+    }
+  }
+
+  return item > 1;
+}
+
+// Testing
+void filterTesting() {
+  int mocked[17] = {-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
   JAarray* array = jugged_array(4);
 
-  for (int i = 1; i < 15; i++) {
-    jugged_push(array, i);
+  for (int i = 0; i < 17; i++) {
+    jugged_push(array, mocked[i]);
   }
 
-  for (int i = 0; i < array->len; i++) {
-    printf("%d\n", array->array[i]);
-  }
+  JAarray* filteredArray = jugged_filter(array, isPrime);
+}
 
-  printf("%d", jugged_every(array, everyWithoutZero));
-
+int main() {
   return 0;
 }
