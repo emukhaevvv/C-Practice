@@ -44,6 +44,23 @@ void jugged_push(JAarray* jAarray, int value) {
   jAarray->len += 1;
 }
 
+void jugged_pop(JAarray* jAarray) {
+  if (jAarray->len == 0) return;
+
+  jAarray->array[jAarray->len] = 0;
+  jAarray->len -= 1;
+}
+
+void jugged_shift(JAarray* jAarray) {
+  if (jAarray->len == 0) return;
+
+  jAarray->len -= 1;
+
+  for (int i = 0; i < jAarray->len; i++) {
+    jAarray->array[i] = jAarray->array[i + 1];
+  }
+}
+
 void jugged_unshift(JAarray* jAarray, int value) {
   check_jugged_full(jAarray);
 
@@ -66,8 +83,10 @@ int main() {
   jugged_unshift(array, 23);
   jugged_unshift(array, 65);
   jugged_unshift(array, 22);
+  jugged_pop(array);
+  jugged_shift(array);
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < array->len; i++) {
     printf("%d\n", array->array[i]);
   }
  
