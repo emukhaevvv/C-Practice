@@ -72,8 +72,18 @@ void jugged_unshift(JAarray* jAarray, int value) {
   jAarray->len += 1;
 }
 
+void jugged_concat(JAarray* jAarrayX, JAarray* jAarrayY) {
+  for (int i = 0; i < jAarrayY->len; i++) {
+    jugged_push(jAarrayX, jAarrayY->array[i]);
+  }
+}
+
 int main() {
   JAarray* array = jugged_array(4);
+  JAarray* arrayX = jugged_array(2);
+
+  jugged_push(arrayX, 322);
+  jugged_push(arrayX, 1337);
 
   for (int i = 0; i < 4; i++) {
     jugged_push(array, i);
@@ -85,6 +95,8 @@ int main() {
   jugged_unshift(array, 22);
   jugged_pop(array);
   jugged_shift(array);
+  
+  jugged_concat(array, arrayX);
 
   for (int i = 0; i < array->len; i++) {
     printf("%d\n", array->array[i]);
