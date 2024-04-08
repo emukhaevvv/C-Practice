@@ -1,6 +1,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include <stdbool.h>
+#include "math.h"
 
 typedef struct {
   int len;
@@ -104,6 +105,16 @@ JAarray* jugged_filter(JAarray* jAarray, bool func(int item, int index, JAarray*
   return filteredArray;
 }
 
+int jugged_find(JAarray* jAarray, bool func(int item, int index, JAarray* jAarray)) {
+  for (int i = 0; i < jAarray->len; i++) {
+    int value = jAarray->array[i];
+
+    if (func(value, i, jAarray)) return value;
+  }
+
+  return -1;
+}
+
 // Helpers
 bool everyWithoutZero(int item, int index, JAarray* jAarray) {
   if (jAarray->array[0] == 0 || index > 15) return false;
@@ -129,6 +140,17 @@ void filterTesting() {
   }
 
   JAarray* filteredArray = jugged_filter(array, isPrime);
+}
+
+void findTesting() {
+  int mocked[4] = {4, 5, 8, 12};
+  JAarray* array = jugged_array(4);
+
+  for (int i = 0; i < 4; i++) {
+    jugged_push(array, mocked[i]);
+  }
+
+  int findedInt = jugged_find(array, isPrime);
 }
 
 int main() {
