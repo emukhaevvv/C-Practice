@@ -1,5 +1,6 @@
 #include "stdio.h"
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 
 struct Node
@@ -54,11 +55,29 @@ void push_front(LinkedList* list, int value) {
     list->tail = node;
 }
 
+void pop_front(LinkedList* list) {
+    if (list->head == NULL) return;
+
+    if (list->size == 1) {
+        list->head = NULL;
+        list->tail = NULL;
+    } else {
+        struct Node* node = list->head;
+        list->head = node->next;
+
+        memset(node, 0, sizeof(*node));
+        free(node);
+    }
+}
+
 void main() {
    LinkedList* list = createList();
    push_front(list, 3);
    push_front(list, 4);
    push_front(list, 65);
 
-   printf("%d", list->tail->val);
+   pop_front(list);
+   pop_front(list);
+
+   printf("%d", list->head->val);
 }
