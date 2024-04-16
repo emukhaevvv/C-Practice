@@ -61,6 +61,8 @@ void pop_front(LinkedList* list) {
     if (list->size == 1) {
         list->head = NULL;
         list->tail = NULL;
+
+        list->empty = true;
     } else {
         struct Node* node = list->head;
         list->head = node->next;
@@ -68,6 +70,8 @@ void pop_front(LinkedList* list) {
         memset(node, 0, sizeof(*node));
         free(node);
     }
+
+    list->size -= 1;
 }
 
 void main() {
@@ -78,6 +82,7 @@ void main() {
 
    pop_front(list);
    pop_front(list);
+   pop_front(list);
 
-   printf("%d", list->head->val);
+   printf("%d", list->size);
 }
