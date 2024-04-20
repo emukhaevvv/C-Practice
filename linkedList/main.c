@@ -24,6 +24,7 @@ void pop_back(struct LinkedList* list);
 
 int size(struct LinkedList* list);
 bool empty(struct LinkedList* list);
+int value_at(struct LinkedList* list, int index);
 
 void main() {
     struct LinkedList* list = createLinkedList();
@@ -39,6 +40,21 @@ struct LinkedList* createLinkedList() {
     linkedList->empty = true;
 
     return linkedList;
+}
+
+int value_at(struct LinkedList* list, int index) {
+    if (list->empty == true || index > list->size - 1) return -1;
+
+    struct Node* node = list->head;
+
+    int i = 0;
+
+    while (i != index) {
+        node = node->next;
+        i++;
+    }
+
+    return node->val;
 }
 
 int size(struct LinkedList* list) {
