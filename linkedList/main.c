@@ -19,9 +19,14 @@ struct LinkedList* createLinkedList();
 
 void push_front(struct LinkedList* list, int value);
 void pop_front(struct LinkedList* list);
+void push_back(struct LinkedList* list, int value);
 
 void main() {
     struct LinkedList* list = createLinkedList();
+
+    printf("head: %d\n", list->head->val);
+    printf("tail: %d\n", list->tail->val);
+    printf("size: %d\n", list->size);
 }
 
 struct LinkedList* createLinkedList() {
@@ -46,6 +51,25 @@ void push_front(struct LinkedList* list, int value) {
     } else {
         node->next = list->head;
         list->head = node;  
+    }
+
+    list->size += 1;
+}
+
+void push_back(struct LinkedList* list, int value) {
+    struct Node* node = (struct Node*)malloc(sizeof(struct Node));
+
+    node->val = value;
+    node->next = NULL;
+
+    if (list->empty == true) {
+        list->head = node;
+        list->tail = node;
+
+        list->empty = false;
+    } else {
+        list->tail->next = node;
+        list->tail = node;
     }
 
     list->size += 1;
