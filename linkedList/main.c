@@ -24,11 +24,13 @@ void pop_back(struct LinkedList* list);
 
 int size(struct LinkedList* list);
 bool empty(struct LinkedList* list);
+
 int value_at(struct LinkedList* list, int index);
+void insert(struct LinkedList* list, int index, int value);
 
 void main() {
     struct LinkedList* list = createLinkedList();
-
+    
     printf("head: %d\n", list->head->val);
     printf("tail: %d\n", list->tail->val);
     printf("size: %d\n", size(list));
@@ -40,6 +42,36 @@ struct LinkedList* createLinkedList() {
     linkedList->empty = true;
 
     return linkedList;
+}
+
+void insert(struct LinkedList* list, int index, int value) {
+    if (index == 0) {
+        push_front(list, value);
+        return;
+    }
+
+    if (index < 0 || index > list->size - 1) return;
+
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    
+    newNode->val = value;
+    newNode->next = NULL;
+
+    struct Node* node = list->head;
+    struct Node* prev = NULL;
+
+    int i = 0;
+
+    while (i != index) {
+        prev = node;
+        node = node->next;
+
+        i++;
+    }
+
+    newNode->next = node;
+    prev->next = newNode;
+    list->size += 1;
 }
 
 int value_at(struct LinkedList* list, int index) {
