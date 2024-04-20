@@ -22,12 +22,15 @@ void pop_front(struct LinkedList* list);
 void push_back(struct LinkedList* list, int value);
 void pop_back(struct LinkedList* list);
 
+int size(struct LinkedList* list);
+bool empty(struct LinkedList* list);
+
 void main() {
     struct LinkedList* list = createLinkedList();
 
     printf("head: %d\n", list->head->val);
     printf("tail: %d\n", list->tail->val);
-    printf("size: %d\n", list->size);
+    printf("size: %d\n", size(list));
 }
 
 struct LinkedList* createLinkedList() {
@@ -36,6 +39,14 @@ struct LinkedList* createLinkedList() {
     linkedList->empty = true;
 
     return linkedList;
+}
+
+int size(struct LinkedList* list) {
+    return list->size;
+}
+
+bool empty(struct LinkedList* list) {
+    return list->empty;
 }
 
 void push_front(struct LinkedList* list, int value) {
