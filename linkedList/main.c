@@ -20,6 +20,7 @@ struct LinkedList* createLinkedList();
 void push_front(struct LinkedList* list, int value);
 void pop_front(struct LinkedList* list);
 void push_back(struct LinkedList* list, int value);
+void pop_back(struct LinkedList* list);
 
 void main() {
     struct LinkedList* list = createLinkedList();
@@ -90,6 +91,33 @@ void pop_front(struct LinkedList* list) {
         temp->next = NULL;
         free(temp);
         temp = NULL;
+    }
+
+    list->size -= 1;
+}
+
+void pop_back(struct LinkedList* list) {
+    if (list->empty == true) return;
+
+    if (list->size == 1) {
+        list->head = NULL;
+        list->tail = NULL;
+
+        list->empty = true;
+    } else {
+        struct Node* node = list->head;
+        struct Node* prevNode = NULL;
+
+        while (node->next != NULL) {
+            prevNode = node;
+            node = node->next;
+        }
+
+        prevNode->next = NULL;
+        list->tail = prevNode;
+
+        free(node);
+        node = NULL;
     }
 
     list->size -= 1;
