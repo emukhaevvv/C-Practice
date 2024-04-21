@@ -28,6 +28,7 @@ bool empty(struct LinkedList* list);
 int value_at(struct LinkedList* list, int index);
 void insert(struct LinkedList* list, int index, int value);
 void erase(struct LinkedList* list, int index);
+int reverse(struct LinkedList* list);
 
 void main() {
     struct LinkedList* list = createLinkedList();
@@ -43,6 +44,34 @@ struct LinkedList* createLinkedList() {
     linkedList->empty = true;
 
     return linkedList;
+}
+
+int reverse(struct LinkedList* list) {
+    if (list->empty == true) return;
+
+    struct Node* p = NULL;
+    struct Node* c = list->head;
+    struct Node* n = list->head->next;
+
+    bool isFirst = true;
+
+    while (c->next != NULL) {
+       c->next = p;
+       p = c;
+
+       if (isFirst == true) {
+        list->tail = c;
+        isFirst = false;
+       }
+
+       c = n;
+       n = n->next;
+    }
+
+    c->next = p;
+    p = c;
+
+    list->head = p;
 }
 
 void erase(struct LinkedList* list, int index) {
