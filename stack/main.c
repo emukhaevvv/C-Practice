@@ -20,15 +20,25 @@ struct Stack* create_stack(int max) {
     return stack;
 }
 
+int isFull(struct Stack* stack) {
+   if (stack->max - 1 == stack->size) return 1;
+   return 0;
+}
+
+int isEmpty(struct Stack* stack) {
+    if (stack->size == -1) return 1;
+    return 0;
+}
+
 void push(struct Stack* stack, int val) {
-    if (stack->max - 1 == stack->size) return;
+    if (isFull(stack)) return;
 
     stack->size += 1;
     stack->stack[stack->size] = val;
 }
 
 int pop(struct Stack* stack) {
-    if (stack->size == -1) return -1;
+    if (isEmpty(stack)) return -1;
 
     int val = stack->stack[stack->size];
     stack->size -= 1;
