@@ -27,6 +27,15 @@ void push(struct Stack* stack, int val) {
     stack->stack[stack->size] = val;
 }
 
+int pop(struct Stack* stack) {
+    if (stack->size == -1) return -1;
+
+    int val = stack->stack[stack->size];
+    stack->size -= 1;
+
+    return val;
+}
+
 void main() {
     struct Stack* s = create_stack(4);
 }
