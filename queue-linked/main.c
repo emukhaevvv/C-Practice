@@ -3,95 +3,50 @@
 #include <string.h>
 #include <stdbool.h>
 
-struct Node
-{
+struct Node {
     int val;
     struct Node* next;
 };
 
-struct LinkedListQueue {
-    struct Node* head;
-    struct Node* tail;
-    struct Node* first;
-    int size;
-    int max;
-    int point;
-    int headIndex;
+struct Linked {
+    struct Node* front;
+    struct Node* back;
 };
 
-struct LinkedListQueue* createList(int size) {
-    struct LinkedListQueue* list = (struct LinkedListQueue*)malloc(sizeof(struct LinkedListQueue));
-
-    list->max = size;
-    list->size = -1;
-    list->point = -1;
-    list->headIndex = 0;
-
-    struct Node* node = (struct Node*)malloc(sizeof(struct Node));
-    node->val = 0;
-    node->next = NULL;
-
-    list->head = node;
-    list->first = node;
-    list->tail = list->head;
-
-    int i = 1;
-    struct Node* current = list->head;
-
-    while (i < list->max) {
-        struct Node* node = (struct Node*)malloc(sizeof(struct Node));
-
-        node->val = 0;
-        node->next = NULL;
-
-        current->next = node;
-        current = node;
-
-        i++;
-    }
-
+struct Linked* create_list() {
+    struct Linked* list = (struct Linked*)malloc(sizeof(struct Linked));
+    list->back = NULL;
+    list->front = NULL;
     return list;
 }
 
-int is_empty(struct LinkedListQueue* q) {
-    if (q->size == -1) return 1;
-    return 0;
-}
+void add(struct Linked* q, int val) {
+    struct Node* node = (struct Node*)malloc(sizeof(struct Node));
+    node->val = val;
 
-int is_full(struct LinkedListQueue* q) {
-    if (q->point == q->max - 1) return 1;
-    return 0;
-}
-
-void enqueue(struct LinkedListQueue* q, int value) {
-    if (is_full(q)) {
-        q->point = 0;
-        q->tail = q->first;
-        q->tail->val = value;
-        q->tail = q->tail->next;
+    if (!q->front && !q->back) {
+        q->front = node;
+        q->front->next = q->front;
+        q->back = q->front;
     } else {
-        q->tail->val = value;
-        q->tail = q->tail->next;
-        q->point += 1;
-        q->size += 1;
+        q->back->next = node;
+        q->back = q->back->next;
+        q->back->next = q->front;
     }
 }
 
-void dequeue(struct LinkedListQueue* q) {
-    if (is_empty(q)) return;
-
-    q->head->val = 0;
-
-    if (q->headIndex == q->max - 1) {
-        q->head = q->first;
+void rem(struct Linked* q) {
+    if (!q->front && !q->back) return;
+    
+    if (q->front == q->back) {
+        q->front = NULL;
+        q->back = NULL;
     } else {
-        q->head = q->head->next;
-        q->headIndex += 1;
-    } 
-
-    q->size -= 1;
+        q->front = q->front->next;
+        q->back->next = q->front;
+    }
 }
 
 void main() {
-   struct LinkedListQueue* list = createList(4);
+    struct Linked* q = create_list();
 }
