@@ -9,120 +9,198 @@ struct Node {
     struct Node* next;
 };
 
-struct Hash {
+struct LinkedList {
     int size;
     struct Node* head;
 };
 
 struct HashTable {
     int size;
-    struct Hash** hashes;
+    int max;
+    struct LinkedList** hash;
 };
 
-struct HashTable* CreateHashTable(int size) {
-    struct HashTable* table = (struct HashTable*)malloc(sizeof(struct HashTable*));
+struct LinkedList* createLinkedList();
+struct HashTable* createHashTable(int size);
 
-    table->size = size;
-    table->hashes = (struct Hash**)malloc(sizeof(struct Hash) / size);
+struct Node* createNode(char* key, char* value);
 
-    for (int i = 0; i < size; i++) {
-        table->hashes[i] = (struct Hash*)malloc(sizeof(struct Hash));
-        table->hashes[i]->head = (struct Node*)malloc(sizeof(struct Node));
-        
-        table->hashes[i]->size = 0;
-        table->hashes[i]->head->key = "";
-        table->hashes[i]->head->value = "";
-        table->hashes[i]->head->next = NULL;
-    }
+bool addToLinkedList(struct LinkedList* l, char* key, char* value);
 
-    return table;
+int hashValue(struct HashTable* h, char* key);
+void add(struct HashTable* h, char* key, char* value);
+char* get(struct HashTable* h, char* key);
+void removeKey(struct HashTable* h, char* key);
+void updateHashtable(struct HashTable* h, struct HashTable* newH);
+
+void main() {
+    struct HashTable* hash = createHashTable(3);
 }
 
-int hash(struct HashTable* table, char* key) {
-    int total = 0;
+struct LinkedList* createLinkedList() {
+    struct LinkedList* list = (struct LinkedList*)malloc(sizeof(struct LinkedList));
+
+    list->size = 0;
+    list->head = NULL;
+}
+
+struct HashTable* createHashTable(int size) {
+    struct HashTable* hash = (struct HashTable*)malloc(sizeof(struct HashTable));
+
+    hash->size = 0;
+    hash->max = size;
+    hash->hash = (struct LinkedList**)malloc(sizeof(struct LinkedList*) * size);
+
+    for (int i = 0; i <= size; i++) {
+        hash->hash[i] = createLinkedList();
+    }
+
+    return hash;
+}
+
+// Node
+
+struct Node* createNode(char* key, char* value) {
+    struct Node* node = (struct Node*)malloc(sizeof(struct Node));
+
+    node->key = key;
+    node->value = value;
+    node->next = NULL;
+
+    return node;
+}
+
+// Linked List
+
+bool addToLinkedList(struct LinkedList* l, char* key, char* value) {
+    struct Node* node = createNode(key, value);
+
+    bool isFinded = false;
+
+    if (!l->head) {
+        l->head = node;
+    } else {
+        struct Node* cur = l->head;
+        struct Node* prev = NULL;
+
+        while (cur) {
+            if (cur->key == key) {
+                cur->value = value;
+                isFinded = true;
+                break;
+            }
+
+            prev = cur;
+            cur = cur->next;
+        }
+
+        if (!isFinded) {
+            prev->next = node;
+            l->size += 1;
+        }
+    }
+
+    return isFinded;
+}
+
+// HashTable
+
+int hashValue(struct HashTable* h, char* key) {
+    int result = 0;
 
     for (int i = 0; i < strlen(key); i++) {
-        total += key[i];
+        result += key[i];
     }
 
-    return total % table->size;
+    return result % h->max;
 }
 
-void add(struct HashTable* table, char* key, char* value) {
-    int hashedKey = hash(table, key);
-    
-    if (table->hashes[hashedKey]->size == 0) {
-        table->hashes[hashedKey]->head->key = key;
-        table->hashes[hashedKey]->head->value = value;
-        table->hashes[hashedKey]->head->next = NULL; 
+void add(struct HashTable* h, char* key, char* value) {
+    int hashedValue = hashValue(h, key);
 
-       table->hashes[hashedKey]->size = 1;
-    } else {
-        bool finded = false;
-        struct Node* cur = table->hashes[hashedKey]->head;
-        struct Node* prev = NULL;
+    if (h->max == h->size) {
+        struct HashTable* newH = createHashTable(h->size * 2);
+        updateHashtable(h, newH);
 
-        while(cur) {
-            if (cur->key == key) {
-                finded = true;
-                cur->value = value;
-            }
+        add(newH, key, value);
+        return;
+    }
 
-            prev = cur;
-            cur = cur->next;
-        }
+    bool isFinded = addToLinkedList(h->hash[hashedValue], key, value);
 
-        if (!finded) {
-            prev->next = (struct Node*)malloc(sizeof(struct Node));
-            prev->next->key = key;
-            prev->next->value = value;
-            prev->next->next = NULL;
-        }
-
-        table->hashes[hashedKey]->size += 1;
+    if (!isFinded) {
+        h->size += 1;
     }
 }
 
-char* get(struct HashTable* table, char* key) {
-    int hashedKey = hash(table, key);
+char* get(struct HashTable* h, char* key) {
+    int hashedValue = hashValue(h, key);
 
-    if (table->hashes[hashedKey]->size == 0) return "null";
+    if (!h->hash[hashedValue]) return NULL;
 
-    if (table->hashes[hashedKey]->size == 1) {
-        if (table->hashes[hashedKey]->head->key == key) {
-            return table->hashes[hashedKey]->head->value;
-        } else {
-            return "null";
-        }
-    } else {
-        struct Node* cur = table->hashes[hashedKey]->head;
-        struct Node* prev = NULL;
-
-        while(cur) {
-            if (cur->key == key) {
-                return cur->value;
-            }
-
-            prev = cur;
-            cur = cur->next;
-        }
-
-        return "null";
-    }
-}
-
-bool exists(struct HashTable* table, char* key) {
-    int hashedKey = hash(table, key);
-
-    if (!table->hashes[hashedKey]) return false;
-
-    struct Node* cur = table->hashes[hashedKey]->head;
+    struct Node* cur = h->hash[hashedValue]->head;
     struct Node* prev = NULL;
 
     while (cur) {
+        if (cur->key == key) return cur->value;
+
+        prev = cur;
+        cur = cur->next;
+    }
+
+    return NULL;
+}
+
+void removeKey(struct HashTable* h, char* key) {
+    int hashedValue = hashValue(h, key);
+
+    if (!h->hash[hashedValue]) return;
+
+    struct Node* cur = h->hash[hashedValue]->head;
+    struct Node* prev = NULL;
+
+    bool isFinded = false;
+
+    while (cur) {
         if (cur->key == key) {
-            return true;
-        }
+            if (!prev) {
+                if (cur->next) {
+                    h->hash[hashedValue]->head = cur->next;
+                } else {
+                    h->hash[hashedValue]->head = NULL;
+                }
+            } else {
+                if (cur->next) {
+                    prev->next = cur->next;
+                } else {
+                    prev->next = NULL;
+                }
+            }
+
+            isFinded = true;
+        };
+
+        prev = cur;
+        cur = cur->next;
+    }
+
+    if (isFinded) {
+        h->hash[hashedValue]->size -= 1;
+        h->size -= 1;
+    }
+
+}
+
+bool has(struct HashTable* h, char* key) {
+    int hashedValue = hashValue(h, key);
+
+    if (!h->hash[hashedValue]) return false;
+
+    struct Node* cur = h->hash[hashedValue]->head;
+    struct Node* prev = NULL;
+
+    while (cur) {
+        if (cur->key == key) return true;
 
         prev = cur;
         cur = cur->next;
@@ -131,35 +209,25 @@ bool exists(struct HashTable* table, char* key) {
     return false;
 }
 
-void removeKey(struct HashTable* table, char* key) {
-    int hashedKey = hash(table, key);
+void updateHashtable(struct HashTable* h, struct HashTable* newH) {
+    for (int i = 0; i < h->max; i++) {
+        if (h->hash[i]->head) {
+            struct Node* cur = h->hash[i]->head;
+            struct Node* prev = NULL;
 
-    if (table->hashes[hashedKey]->size == 0 || !table->hashes[hashedKey]) return;
+            while (cur) {
+                add(newH, cur->key, cur->value);
 
-    struct Node* cur = table->hashes[hashedKey]->head;
-    struct Node* prev = NULL;
-
-    while(cur) {
-        if (cur->key == key) {
-            if (table->hashes[hashedKey]->size == 1) {
-                table->hashes[hashedKey]->head = (struct Node*)malloc(sizeof(struct Node));
-                table->hashes[hashedKey]->head->key = "";
-                table->hashes[hashedKey]->head->value = "";
-                table->hashes[hashedKey]->head->next = NULL;
-            } else {
-                prev->next = cur->next;
-                free(cur);
-                cur = NULL;
+                prev = cur;
+                cur = cur->next;
             }
-
-            table->hashes[hashedKey]->size -= 1;
         }
-
-        prev = cur;
-        cur = cur->next;
     }
-}
 
-void main() {
-    struct HashTable* hashTable = CreateHashTable(4);
+    h->hash = newH->hash;
+    h->max = newH->max;
+    h->size = newH->size;
+
+    free(newH);
+    newH = NULL;
 }
